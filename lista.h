@@ -1,7 +1,7 @@
 #ifndef LISTA_H_INCLUDED
 #define LISTA_H_INCLUDED
 
-// Macros con c�digos de finalización
+// Macros con códigos de finalización
 #define LST_NO_EXISTE_SIGUIENTE     1
 #define LST_NO_EXISTE_ANTERIOR      2
 #define LST_POSICION_INVALIDA       3
@@ -20,7 +20,7 @@ typedef void * tElemento;
 // ---------------------------------------------------------------------------------------------
 // Definición de prototipos y documentación de las funciones.
 // Obs.: a todo efecto y en tanto no se indique lo contrario, toda posición parametrizada
-// es considerada álida.
+// es considerada válida.
 // ---------------------------------------------------------------------------------------------
 
 /**
