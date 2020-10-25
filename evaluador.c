@@ -111,15 +111,17 @@ void menu_operaciones(FILE* archivo_texto)
                 if (l>0)   /* si longitud de palabra es mayor a 0 arme una cadena*/
                 {
                     palabra[l]='\0'; //le asigno fin de palabra.
-                    tValor valor = m_recuperar(mapeo,palabra);
+                    (int)tValor valor = m_recuperar(mapeo,palabra);
                     if (valor==NULL){
                         valor = 0;
+                    }else {
+                        valor++;
                     }
                     if( m_insertar(mapeo,palabra,valor) != NULL)
-                        printf("Insertó la palabra '%s' o las letras restantes\n",palabra);
+                        printf("Incremento el valor de la clave palabra. \n",palabra);
 
                     else /*=0*/
-                        printf("La palabra '%s' ya estaba en el trie o está en el comienzo de otra palabra ya insertada, incrementé la cantidad en 1\n",palabra);
+                        printf("La palabra '%s' no estaba en el mapeo \n",palabra);
                     int h=0;
                     while (h<40)  /*borro palabra usada*/
                     {
