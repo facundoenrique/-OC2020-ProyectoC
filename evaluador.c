@@ -41,7 +41,7 @@ int ingreso_nro_de_operacion()
         }
         else
         {
-            if(nro_operacion<1 || nro_operacion>6)
+            if(nro_operacion<1 || nro_operacion>2)
             {
                 printf("No ingresó un número válido, ingrese nuevamente un número de operación: ");
             }
