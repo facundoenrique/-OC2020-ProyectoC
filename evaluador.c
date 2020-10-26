@@ -6,7 +6,14 @@
 #define separadores (caracteres[i]==44||caracteres[i]==46||caracteres[i]==58||caracteres[i]==59||caracteres[i]==73)
 
 
-void mostrarPalabra(char * palabra,tMapeo map){
+void mostrarPalabra(tMapeo map){
+
+    printf("# Operación 2 : Buscar palabra en el archivo #\n");
+    char* palabra = malloc(40);
+    printf("Ingrese una palabra para chequear si está en el archivo: ");
+    char * palabra
+    scanf("%s",palabra);
+
     int valor = (int) m_recuperar(map,palabra);
     if (valor==NULL){
         printf("La palabra no se encuentra en el texto");
@@ -114,7 +121,7 @@ void operaciones(tMapeo map)
     switch(nro_operacion)
     {
     case 1:
-//      mostrarPalabras(map);      ----------> lo puse como comentario porque falta implementarlo y sino no compilaba
+        mostrarPalabra(map);      ----------> lo puse como comentario porque falta implementarlo y sino no compilaba
         operaciones(map); //vuelvo a llamar a operaciones para que el usuario decida como continuar.
         break;
     case 2:
