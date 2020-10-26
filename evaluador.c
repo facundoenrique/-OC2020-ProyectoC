@@ -1,27 +1,56 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mapeo.h>
+#include "mapeo.h"
+#include "lista.h"
 #define separadores (caracteres[i]==44||caracteres[i]==46||caracteres[i]==58||caracteres[i]==59||caracteres[i]==73)
 
-
-
-/**
-* Funcion que compara 2 claves enteras
-*/
-
-int comparacion(tClave * clave1, tClave * clave2)
+//Funcion para comparar dos claves, las claves en este caso son caracteres
+//No se si esta bien hecho asi, es la unica forma que se me ocurrio
+//El comparador retorna 0 si las dos claves son IGUALES
+int comparacion_claves_evaluador(char* palabra1, char* palabra2)
 {
+    int son_iguales=1;
+    int i=0;
+    while (son_iguales==1 && '\0'!=*(palabra1+i))
+    {
+        if (*(palabra1+i)!=*(palabra2+i))
+            son_iguales=0;
+        else
+            i=i+1;
+    }
+    if (son_iguales==0) /*NO SON IGUALES*/
+        return 1;
+    else
+        return 0;
+}
 
-        int *a, *b;
+//Una ayudante paso una pagina con codigos de hash y copie este
+int funcion_hash_evaluador(char *palabra)
+{
+    long hash = 5381;
+    int c;
 
-        a = (int *) clave1;
-        b = (int *) clave2;
+    while (c = *palabra++)
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
-        if (a==b)
-            return 1
-        else return 0;
+    return hash;
+}
 
+void funcion_eliminar_claves_evaluador(char *palabra)
+{
+    //Esta bien hecho asi? Hay que eliminar todos los char que componen la palabra
+    int i=0;
+    while (*(palabra+i)!='\0')
+    {
+        free(*(palabra+i));
+        i=i+1;
+    }
+}
+
+void funcion_eliminar_valores_evaluador(int *valor)
+{
+    free(valor);
 }
 
 
@@ -54,30 +83,31 @@ int ingreso_nro_de_operacion()
     return nro_operacion;
 }
 
-void salir(TMapeo mapeo)
+void salir(tMapeo mapeo)
 {
 
-    recorroYborro(trie,trie->raiz);
-    m_destruir(mapeo,eliminarClave(),eliminarValor());
+
+    m_destruir(&mapeo,&funcion_eliminar_claves_evaluador,&funcion_eliminar_valores_evaluador);
     free(mapeo);
     printf("Operación realizada con éxito\n");
     exit(0);
 }
 
-void operaciones(TTrie trie)
+void operaciones(tMapeo map)
 {
-    printf("¿Qué operación desea realizar ahora? ");
+    printf("¿Qué operación desea realizar ahora? \n");
     int nro_operacion = ingreso_nro_de_operacion();
     switch(nro_operacion)
     {
     case 1:
-        mostrarPalabras(trie);
-        operaciones(trie);
+//      mostrarPalabras(map);      ----------> lo puse como comentario porque falta implementarlo y sino no compilaba
+        operaciones(map);
         break;
     case 2:
-        salir(mapeo);
+        salir(map);
         break;
 
+    }
 }
 
 
@@ -86,8 +116,10 @@ void menu_operaciones(FILE* archivo_texto)
     char* caracteres; /*para leer cada renglon*/
 
     caracteres=(char*)malloc(100*sizeof(char));
+    tMapeo mapeo;
+    crear_mapeo(&mapeo,5,&funcion_hash_evaluador,&comparacion_claves_evaluador);
 
-    TTrie trie =  crear_trie();
+
     char* palabra;
     palabra = (char*)malloc(40*sizeof(char));
     while (feof(archivo_texto)==0)
@@ -111,21 +143,23 @@ void menu_operaciones(FILE* archivo_texto)
                 if (l>0)   /* si longitud de palabra es mayor a 0 arme una cadena*/
                 {
                     palabra[l]='\0'; //le asigno fin de palabra.
-                    (int)tValor valor = m_recuperar(mapeo,palabra);
+                    //(int)tValor valor = m_recuperar(mapeo,palabra);
+                    int valor=(int)m_recuperar(mapeo,palabra);
                     if (valor==NULL){
-                        valor = 0;
-                    }else {
-                        valor++;
-                    }
-                    if( m_insertar(mapeo,palabra,valor) != NULL)
+//----------------------valor = 0;
+                        m_insertar(mapeo,palabra,1);
                         printf("Incremento el valor de la clave palabra. \n",palabra);
+                    }else {
+//---------------------valor++;
+                       m_insertar(mapeo,palabra,valor+1);
+                       printf("La palabra '%s' no estaba en el mapeo \n",palabra);
+                    }
 
-                    else /*=0*/
-                        printf("La palabra '%s' no estaba en el mapeo \n",palabra);
                     int h=0;
                     while (h<40)  /*borro palabra usada*/
                     {
                         palabra[h]=0;
+//----->>>>>>>>>>>>>>>>> o palabra[h]=NULL; ?
                         h++;
                     }
                     j=0;
@@ -137,12 +171,13 @@ void menu_operaciones(FILE* archivo_texto)
     free(palabra);
     fclose(archivo_texto); //cierro archivo, ya no lo uso
 
-    if(trie->cantidad_elementos > 0)
+
+    if(mapeo->cantidad_elementos > 0)
     {
         printf("Menú de operaciones:\n");
         printf("1- Cantidad de apariciones\n");
         printf("2- Salir: permite salir del programa\n");
-        operaciones(trie);
+        operaciones(mapeo);
     }
     else
         printf("El archivo no contiene palabras válidas.\n");
@@ -169,7 +204,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        printf ("Error ante la invicación del programa\n");
+        printf ("Error ante la invocación del programa\n");
         return -2;
     }
     return 0; /*?*/
