@@ -5,6 +5,20 @@
 #include "lista.h"
 #define separadores (caracteres[i]==44||caracteres[i]==46||caracteres[i]==58||caracteres[i]==59||caracteres[i]==73)
 
+
+void mostrarPalabra(char * palabra,tMapeo map){
+    int valor = (int) m_recuperar(map,palabra);
+    if (valor==NULL){
+        printf("La palabra no se encuentra en el texto");
+    }else {
+        if (valor>1)
+            printf(palabra+"palabra se encuentra "+valor+" veces en el texto");
+        else printf(palabra+"palabra se encuentra 1 vez en el texto");
+    }
+
+}
+
+
 //Funcion para comparar dos claves, las claves en este caso son caracteres
 //No se si esta bien hecho asi, es la unica forma que se me ocurrio
 //El comparador retorna 0 si las dos claves son IGUALES
@@ -101,7 +115,7 @@ void operaciones(tMapeo map)
     {
     case 1:
 //      mostrarPalabras(map);      ----------> lo puse como comentario porque falta implementarlo y sino no compilaba
-        operaciones(map);
+        operaciones(map); //vuelvo a llamar a operaciones para que el usuario decida como continuar.
         break;
     case 2:
         salir(map);
