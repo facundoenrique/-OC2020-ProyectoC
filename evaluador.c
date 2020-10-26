@@ -8,7 +8,7 @@
 
 void mostrarPalabra(tMapeo map){
 
-    printf("# Operación 2 : Buscar palabra en el archivo #\n");
+    printf("# Operación 1 : Buscar palabra en el archivo #\n");
     char* palabra = malloc(40);
     printf("Ingrese una palabra para chequear si está en el archivo: ");
     char * palabra
