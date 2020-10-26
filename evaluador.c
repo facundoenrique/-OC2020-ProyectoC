@@ -16,11 +16,11 @@ void mostrarPalabra(tMapeo map){
 
     int valor = (int) m_recuperar(map,palabra);
     if (valor==NULL){
-        printf("La palabra no se encuentra en el texto");
+        printf("La palabra no se encuentra en el texto \n");
     }else {
         if (valor>1)
-            printf(palabra+"palabra se encuentra "+valor+" veces en el texto");
-        else printf(palabra+"palabra se encuentra 1 vez en el texto");
+            printf(palabra+"palabra se encuentra "+valor+" veces en el texto \n");
+        else printf(palabra+"palabra se encuentra 1 vez en el texto \n");
     }
 
 }
