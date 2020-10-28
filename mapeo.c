@@ -233,13 +233,14 @@ extern void m_eliminar(tMapeo m, tClave c, void (*fEliminarC)(void *), void (*fE
         entrada_que_se_esta_viendo->clave=NULL;
         entrada_que_se_esta_viendo->valor=NULL;
         entrada_que_se_esta_viendo=NULL;
+    }
 }
 
 /**
  Destruye el mapeo M, elimininando cada una de sus entradas.
  Las claves y valores almacenados en las entradas son eliminados mediante las funciones fEliminarC y fEliminarV.
 **/
-extern void m_destruir(tMapeo * m, void (*fEliminarC)(void *), void (*fEliminarV)(void *))
+void m_destruir(tMapeo * m, void (*fEliminarC)(void *), void (*fEliminarV)(void *))
 {
     funcion_eliminar_claves=fEliminarC;
     funcion_eliminar_valores=fEliminarV;
@@ -286,3 +287,5 @@ extern tValor m_recuperar(tMapeo m, tClave c)
     }
     return valor_a_retornar;
 }
+
+
