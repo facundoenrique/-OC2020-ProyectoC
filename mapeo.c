@@ -233,7 +233,7 @@ extern void m_eliminar(tMapeo m, tClave c, void (*fEliminarC)(void *), void (*fE
         entrada_que_se_esta_viendo->clave=NULL;
         entrada_que_se_esta_viendo->valor=NULL;
         entrada_que_se_esta_viendo=NULL;
-    }
+}
 }
 
 /**
