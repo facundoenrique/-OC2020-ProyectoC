@@ -5,3 +5,4 @@ bin/Debug/test.txt
 obj/Debug/evaluador.o
 obj/Debug/mapeo.o
 obj/Release/mapeo.o
+evaluador.depend
