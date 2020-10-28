@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "mapeo.h"
 #include "lista.h"
 #define separadores (caracteres[i]==44||caracteres[i]==46||caracteres[i]==58||caracteres[i]==59||caracteres[i]==73)
@@ -138,6 +139,7 @@ void operaciones(tMapeo map)
 
 void menu_operaciones(FILE* archivo_texto)
 {
+    printf("menu operaciones");
     char* caracteres; /*para leer cada renglon*/
 
     caracteres=(char*)malloc(100*sizeof(char));
@@ -208,7 +210,7 @@ void menu_operaciones(FILE* archivo_texto)
         printf("El archivo no contiene palabras válidas.\n");
 }
 
-int main(int argc, char *argv[])
+int main(int argc)
 {
     printf("##### EVALUADOR DE ARCHIVO DE TEXTO#####\n");
     if(argc==2)
@@ -232,5 +234,5 @@ int main(int argc, char *argv[])
         printf ("Error ante la invocación del programa\n");
         return -2;
     }
-    return 0; /*?*/
+   // return 0; /*?*/
 }
