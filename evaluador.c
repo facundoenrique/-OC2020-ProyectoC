@@ -15,7 +15,7 @@ void mostrarPalabra(tMapeo map){
     scanf("%s",palabra);
 
     int valor = (int) m_recuperar(map,palabra);
-    if (valor==NULL){
+    if (valor==0){
         printf("La palabra no se encuentra en el texto \n");
     }else {
         if (valor>1){
@@ -140,13 +140,11 @@ void operaciones(tMapeo map)
 
 void menu_operaciones(FILE* archivo_texto)
 {
-
     char* caracteres; /*para leer cada renglon*/
 
     caracteres=(char*)malloc(100*sizeof(char));
     tMapeo mapeo;
     crear_mapeo(&mapeo,5,&funcion_hash_evaluador,&comparacion_claves_evaluador);
-
 
     char* palabra;
     palabra = (char*)malloc(40*sizeof(char));
@@ -171,26 +169,29 @@ void menu_operaciones(FILE* archivo_texto)
             }
             else   //si es un separador, puedo haber terminado de armar la palabra
             {
-
                 int l = strlen(palabra);
-
-
                 if (l>0)   // si longitud de palabra es mayor a 0 arme una cadena
                 {
+                    int valor=0;
+                    if (m_recuperar(mapeo,palabra)!=NULL){
+                        printf("NUEVO \n");
+                        valor = (int)m_recuperar(mapeo,palabra);
 
-                    printf("%s \n",palabra);
+                    }else {
 
-                    int valor=(int)m_recuperar(mapeo,palabra);
-                    if (valor==NULL){
-
+                    }
+                    if (valor==0){
+                      //no esta en el mapeo
                       m_insertar(mapeo,palabra,1);
-                      printf("Incremento el valor de la clave '%s'. \n",palabra);
+                      //chequeo que se inserto
+                       int mostrado = (int)m_recuperar(mapeo,palabra);
+                      printf("%s %i nuevo \n",palabra,mostrado);
                     }else {
 
                        m_insertar(mapeo,palabra,valor+1);
-                       printf("La palabra '%s' no estaba en el mapeo \n",palabra);
+                       int mostrado2 = (int)m_recuperar(mapeo,palabra);
+                       printf("%s %i \n",palabra,mostrado2);
                     }
-
                     int h=0;
                     while (h<40)  //borro palabra usada
                     {
@@ -204,8 +205,8 @@ void menu_operaciones(FILE* archivo_texto)
         }
     } //fin while
 
-    free(caracteres);
-    free(palabra);
+    free(caracteres); //libero la memoria asignada
+    free(palabra); //libero la memoria asignada
     fclose(archivo_texto); //cierro archivo, ya no lo uso
 
 
