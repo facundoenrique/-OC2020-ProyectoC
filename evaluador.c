@@ -5,22 +5,26 @@
 #include "lista.h"
 #define separadores (caracteres[i]==44||caracteres[i]==46||caracteres[i]==58||caracteres[i]==59||caracteres[i]==73)
 
-
 void mostrarPalabra(tMapeo map){
 
     printf("# Operación 1 : Buscar palabra en el archivo #\n");
     char* palabra = malloc(40);
     printf("Ingrese una palabra para chequear si está en el archivo: ");
-    char * palabra
     scanf("%s",palabra);
 
     int valor = (int) m_recuperar(map,palabra);
     if (valor==NULL){
         printf("La palabra no se encuentra en el texto \n");
     }else {
-        if (valor>1)
-            printf(palabra+"palabra se encuentra "+valor+" veces en el texto \n");
-        else printf(palabra+"palabra se encuentra 1 vez en el texto \n");
+        if (valor>1){
+            printf("%c",palabra);
+            printf("%s", "se encuentra ");
+            printf(valor);printf(" veces en el texto \n");
+        }else {
+
+            printf("%c",palabra);
+            printf(" palabra se encuentra 1 vez en el texto \n");
+        }
     }
 
 }
@@ -121,7 +125,7 @@ void operaciones(tMapeo map)
     switch(nro_operacion)
     {
     case 1:
-        mostrarPalabra(map);      ----------> lo puse como comentario porque falta implementarlo y sino no compilaba
+        mostrarPalabra(map);    //  ----------> lo puse como comentario porque falta implementarlo y sino no compilaba
         operaciones(map); //vuelvo a llamar a operaciones para que el usuario decida como continuar.
         break;
     case 2:

@@ -1,0 +1,28 @@
+# depslib dependency file v1.0
+1603845873 source:d:\users\facu\codeblocks-workspace\evaluador\lista.c
+	<stdlib.h>
+	<stdio.h>
+	"lista.h"
+
+1602178276 d:\users\facu\codeblocks-workspace\evaluador\lista.h
+
+1514140574 source:d:\users\facu\codeblocks-workspace\evaluador\main.c
+	<stdio.h>
+	<stdlib.h>
+
+1603904413 source:d:\users\facu\codeblocks-workspace\evaluador\mapeo.c
+	<stdlib.h>
+	<stdio.h>
+	"mapeo.h"
+	"lista.h"
+
+1603652417 d:\users\facu\codeblocks-workspace\evaluador\mapeo.h
+	"lista.h"
+
+1603905058 source:d:\users\facu\codeblocks-workspace\evaluador\evaluador.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"mapeo.h"
+	"lista.h"
+

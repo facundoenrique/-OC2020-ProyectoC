@@ -7,6 +7,7 @@
  Una referencia a la lista creada es referenciada en *L.
  Finaliza indicando LST_ERROR_MEMORIA si no es posible reservar memoria correspondientemente.
 **/
+
 extern void crear_lista(tLista *l)
 {
     *l=(tLista)malloc(sizeof(tLista));
@@ -22,14 +23,14 @@ extern void crear_lista(tLista *l)
  L' = A,B,E,C,D.
  Finaliza indicando LST_ERROR_MEMORIA si no es posible reservar memoria correspondientemente.
 **/
+
 extern void l_insertar(tLista l, tPosicion p, tElemento e)
 {
     struct celda *nueva_celda=(struct celda*)malloc(sizeof(struct celda));
     if (nueva_celda==NULL)
         exit(LST_ERROR_MEMORIA);
-    //No se si esta bien que se agregue el LST_POSICION_INVALIDA
-    if (p==NULL)
-        exit(LST_POSICION_INVALIDA);
+    if (p!=NULL)
+    {
     if (l->siguiente!=NULL)
     {
             nueva_celda->siguiente=p->siguiente;
@@ -41,6 +42,7 @@ extern void l_insertar(tLista l, tPosicion p, tElemento e)
         l->siguiente=nueva_celda;
     }
     nueva_celda->elemento=e;
+    }
 }
 
 /**
@@ -50,7 +52,7 @@ extern void l_insertar(tLista l, tPosicion p, tElemento e)
 **/
 extern void l_eliminar(tLista l, tPosicion p, void (*fEliminar)(tElemento))
 {
-    if (p==l_fin(l))
+    if (p->siguiente==NULL)
         exit (LST_POSICION_INVALIDA);
     fEliminar(p->siguiente->elemento);
     tPosicion posicion_auxiliar=p->siguiente->siguiente;
@@ -62,6 +64,7 @@ extern void l_eliminar(tLista l, tPosicion p, void (*fEliminar)(tElemento))
  Destruye la lista L, elimininando cada una de sus celdas.
  Los elementos almacenados en las celdas son eliminados mediante la funcion fEliminar.
 **/
+
 extern void l_destruir(tLista * l, void (*fEliminar)(tElemento))
 {
     tPosicion posicion=*l;
@@ -83,9 +86,12 @@ extern void l_destruir(tLista * l, void (*fEliminar)(tElemento))
  Recupera y retorna el elemento en la posicion P.
  Finaliza indicando LST_POSICION_INVALIDA si P es fin(L).
 **/
+
 extern tElemento l_recuperar(tLista l, tPosicion p)
 {
-    if (p==l_fin(l))
+    //if (p==l_fin(l))
+    //   exit(LST_POSICION_INVALIDA);
+    if (p->siguiente==NULL)
         exit(LST_POSICION_INVALIDA);
     return p->siguiente->elemento;
 }
@@ -94,6 +100,7 @@ extern tElemento l_recuperar(tLista l, tPosicion p)
  Recupera y retorna la primera posicion de L.
  Si L es vacia, primera(L) = ultima(L) = fin(L).
 **/
+
 extern tPosicion l_primera(tLista l)
 {
     tPosicion primera_posicion=l;
@@ -104,9 +111,10 @@ extern tPosicion l_primera(tLista l)
  Recupera y retorna la posicion siguiente a P en L.
  Finaliza indicando LST_NO_EXISTE_SIGUIENTE si P es fin(L).
 **/
+
 extern tPosicion l_siguiente(tLista l, tPosicion p)
 {
-    if (p==l_fin(l))
+    if (p->siguiente==NULL)
         exit(LST_NO_EXISTE_SIGUIENTE);
     return p->siguiente;
 }
@@ -115,9 +123,10 @@ extern tPosicion l_siguiente(tLista l, tPosicion p)
  Recupera y retorna la posicion anterior a P en L.
  Finaliza indicando LST_NO_EXISTE_ANTERIOR si P es primera(L).
 **/
+
 extern tPosicion l_anterior(tLista l, tPosicion p)
 {
-    tPosicion posicion=l_primera(l);
+    tPosicion posicion=l;
     if (posicion==p)
         exit(LST_NO_EXISTE_ANTERIOR);
     int encontre=0;
@@ -138,9 +147,10 @@ extern tPosicion l_anterior(tLista l, tPosicion p)
  Recupera y retorna la ultima posicion de L.
  Si L es vacia, primera(L) = ultima(L) = fin(L).
 **/
+
 extern tPosicion l_ultima(tLista l)
 {
-    tPosicion posicion=l_primera(l);
+    tPosicion posicion=l;
     if (posicion->siguiente!=NULL)
     {
         while(posicion->siguiente->siguiente!=NULL)
@@ -155,9 +165,11 @@ extern tPosicion l_ultima(tLista l)
  Recupera y retorna la posicion fin de L.
  Si L es vacia, primera(L) = ultima(L) = fin(L).
 **/
+
 extern tPosicion l_fin(tLista l)
 {
-    tPosicion posicion=l_primera(l);
+    //tPosicion posicion=l_primera(l);
+    tPosicion posicion=l;
     if(posicion->siguiente!=NULL){
         while(posicion->siguiente!=NULL)
         {
@@ -170,6 +182,7 @@ extern tPosicion l_fin(tLista l)
 /**
  Retorna la longitud actual de la lista.
 **/
+
 extern int l_longitud(tLista l)
 {
     tPosicion posicion=l;
