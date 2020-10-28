@@ -4,7 +4,8 @@
 
 #include "mapeo.h"
 #include "lista.h"
-#define separadores (caracteres[i]==44||caracteres[i]==46||caracteres[i]==58||caracteres[i]==59||caracteres[i]==73)
+#define letras (caracteres[i]>=97 && caracteres[i]<=122)
+
 
 void mostrarPalabra(tMapeo map){
 
@@ -18,9 +19,9 @@ void mostrarPalabra(tMapeo map){
         printf("La palabra no se encuentra en el texto \n");
     }else {
         if (valor>1){
-            printf("%c",palabra);
-            printf("%s", "se encuentra ");
-            printf(valor);printf(" veces en el texto \n");
+            printf("%s",palabra);
+            printf(" se encuentra ");
+            printf("%i ",valor);printf(" veces en el texto \n");
         }else {
 
             printf("%c",palabra);
@@ -139,7 +140,7 @@ void operaciones(tMapeo map)
 
 void menu_operaciones(FILE* archivo_texto)
 {
-    printf("menu operaciones");
+
     char* caracteres; /*para leer cada renglon*/
 
     caracteres=(char*)malloc(100*sizeof(char));
@@ -149,51 +150,60 @@ void menu_operaciones(FILE* archivo_texto)
 
     char* palabra;
     palabra = (char*)malloc(40*sizeof(char));
+    palabra[0]='\0';
     while (feof(archivo_texto)==0)
     {
-        fgets(caracteres,80,archivo_texto);
+
+        fgets(caracteres,100,archivo_texto);
 
         int i=0;
-        int longitud=strlen(caracteres);
+        int longitud=strlen(caracteres); //longitud del renglon
         int j=0;
-        for (i=0; i<=longitud; i++) /*leo todo el renglon en busca de caracteres no validos*/
+
+        for (i=0; i<=longitud; i++) //leo todo el renglon en busca de caracteres no validos
         {
-            if (!separadores)  /*si no son separadores armo palabra*/
+            if (letras)  //si es una letra armo una palabra
             {
-                /*estoy dentro de una palabra.*/
+                //estoy dentro de una palabra.
                 palabra[j]=caracteres[i];
                 j++;
+                palabra[j]='\0'; //le asigno fin de palabra, aunque no haya llegado al final
             }
-            else   /*si es un separador, puedo haber terminado de armar la palabra*/
+            else   //si es un separador, puedo haber terminado de armar la palabra
             {
+
                 int l = strlen(palabra);
-                if (l>0)   /* si longitud de palabra es mayor a 0 arme una cadena*/
+
+
+                if (l>0)   // si longitud de palabra es mayor a 0 arme una cadena
                 {
-                    palabra[l]='\0'; //le asigno fin de palabra.
-                    //(int)tValor valor = m_recuperar(mapeo,palabra);
+
+                    printf("%s \n",palabra);
+
                     int valor=(int)m_recuperar(mapeo,palabra);
                     if (valor==NULL){
-//----------------------valor = 0;
-                        m_insertar(mapeo,palabra,1);
-                        printf("Incremento el valor de la clave palabra. \n",palabra);
+
+                      m_insertar(mapeo,palabra,1);
+                      printf("Incremento el valor de la clave '%s'. \n",palabra);
                     }else {
-//---------------------valor++;
+
                        m_insertar(mapeo,palabra,valor+1);
                        printf("La palabra '%s' no estaba en el mapeo \n",palabra);
                     }
 
                     int h=0;
-                    while (h<40)  /*borro palabra usada*/
+                    while (h<40)  //borro palabra usada
                     {
                         palabra[h]=0;
 //----->>>>>>>>>>>>>>>>> o palabra[h]=NULL; ?
                         h++;
                     }
                     j=0;
-                }/*fin if*/
-            }/*fin else*/
+                }// fin if
+            }//fin else
         }
-    }
+    } //fin while
+
     free(caracteres);
     free(palabra);
     fclose(archivo_texto); //cierro archivo, ya no lo uso
@@ -210,7 +220,7 @@ void menu_operaciones(FILE* archivo_texto)
         printf("El archivo no contiene palabras válidas.\n");
 }
 
-int main(int argc)
+int main(int argc, char **argv[])
 {
     printf("##### EVALUADOR DE ARCHIVO DE TEXTO#####\n");
     if(argc==2)
@@ -226,6 +236,8 @@ int main(int argc)
         }
         else
         {
+            // se puede agregar un control de tipo de archivo, para ver si es de texto (.txt)
+            printf("Archivo abierto con exito \n");
             menu_operaciones(archivo_texto);
         }
     }
@@ -234,5 +246,5 @@ int main(int argc)
         printf ("Error ante la invocación del programa\n");
         return -2;
     }
-   // return 0; /*?*/
+    return 0; /*?*/
 }
