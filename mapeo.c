@@ -51,6 +51,16 @@ void funcion_eliminar_entradas_vacia()
 
 
 /**
+
+**/
+void funcion_eliminar_entradas_nueva(tElemento e)
+{
+    tEntrada entrada=(tEntrada) e;
+    free(entrada);
+}
+
+
+/**
  Inicializa un mapeo vacio, con capacidad inicial igual al MAX(10, CI).
  Una referencia al mapeo creado es referenciada en *M.
  A todo efecto, el valor hash para las claves sera computado mediante la funcion fHash.
@@ -63,7 +73,7 @@ extern void crear_mapeo(tMapeo * m, int ci, int (*fHash)(void *), int (*fCompara
     *m=(tMapeo)malloc(sizeof(struct mapeo));
     if (*m==NULL)
         exit(MAP_ERROR_MEMORIA);
-    int longitud_t=MAX(10,ci);
+    int longitud_t=MAX(5,ci);
     (*m)->longitud_tabla=longitud_t;
     (*m)->cantidad_elementos = 0;
     (*m)->comparador=fComparacion;
@@ -95,6 +105,7 @@ extern tValor m_insertar(tMapeo m, tClave c, tValor v)
     //De ser asi agrando el arreglo, inicializo las nuevas listas y copio las entradas en las posiciones correspondientes
     //de la nueva lista
 
+    /*
     if ((m->cantidad_elementos)+1>=(75*(m->longitud_tabla)/100))
 
     {
@@ -104,7 +115,7 @@ extern tValor m_insertar(tMapeo m, tClave c, tValor v)
             exit(MAP_ERROR_MEMORIA);
         for (int i=0;i!=longitud_nueva;i++)
         {
-        crear_lista(&*(nuevo_arreglo+i));
+            crear_lista(&*(nuevo_arreglo+i));
         }
 
         int longitud_anterior=m->longitud_tabla;
@@ -115,13 +126,13 @@ extern tValor m_insertar(tMapeo m, tClave c, tValor v)
             //VA *m o m solo? Con m solo da Warning con m* no
             if(l_longitud(*(m->tabla_hash+i))!=0)
             {
-                tPosicion posicion_lista_entradas=l_primera(*(m->tabla_hash+i));
+                tPosicion posicion_lista_entradas=l_primera(*(m->tabla_hash));
                 for (int j=0;j!=l_longitud(*(m->tabla_hash+i));j++)
                 {
                     tEntrada entrada_anterior=(tEntrada) l_recuperar((*(m->tabla_hash+i)),posicion_lista_entradas);
                     tClave clave_anterior=entrada_anterior->clave;
                     int clave_nueva=(m->hash_code(clave_anterior))%(m->longitud_tabla);
-                    l_insertar(*(nuevo_arreglo+clave_nueva),l_primera(*(nuevo_arreglo+clave_nueva)),entrada_anterior);
+                    l_insertar(*(nuevo_arreglo+clave_nueva),l_primera(*(nuevo_arreglo+clave_nueva)),entrada_anterior); //puedo pisar el anterior haciendo asi
                     posicion_lista_entradas=l_siguiente(*(m->tabla_hash+i),posicion_lista_entradas);
                 }
             }
@@ -139,42 +150,51 @@ extern tValor m_insertar(tMapeo m, tClave c, tValor v)
        // o *(m->tabla_hash)=*nuevo_arreglo; ?
     }
 
-//--------------------------------------------------------------------------------------------------// TERMINO DE AGRANDAR EL ARREGLO
-
-    int clave=(m->hash_code(c))%(m->longitud_tabla);
+    //--------------------------------------------------------------------------------------------------// TERMINO DE AGRANDAR EL ARREGLO
+    */
+    int valor_hash=(m->hash_code(c))%(m->longitud_tabla);
     tValor valor_a_retornar=NULL;
 
-    if (l_longitud(*(m->tabla_hash+clave))==0)
+    if (l_longitud(*(m->tabla_hash+valor_hash))==0)
     {
-        struct entrada *nueva_entrada=(struct entrada*)malloc(sizeof(struct entrada));
+
+        tEntrada nueva_entrada=(tEntrada)malloc(sizeof(struct entrada));
         if (nueva_entrada==NULL)
             exit(MAP_ERROR_MEMORIA);
         nueva_entrada->clave=c;
         nueva_entrada->valor=v;
-        l_insertar(*(m->tabla_hash+clave),l_primera(*(m->tabla_hash+clave)),nueva_entrada);
+        l_insertar(*(m->tabla_hash+valor_hash),l_primera(*(m->tabla_hash+valor_hash)),nueva_entrada);
         m->cantidad_elementos=(m->cantidad_elementos)+1;
     }
     else
     {
-        int esta_la_clave=0;
-        tPosicion posicion_lista=l_primera(*(m->tabla_hash+clave));
-        tEntrada entrada_que_se_esta_viendo=(tEntrada)l_recuperar(*(m->tabla_hash+clave),posicion_lista);
 
-        while (esta_la_clave==0 && entrada_que_se_esta_viendo!=(tEntrada)l_recuperar(*(m->tabla_hash+clave),l_ultima(*(m->tabla_hash+clave))))
+        int esta_la_clave=0;
+
+        //en estos 2 renglones que siguen pasan cosas raras.
+        tPosicion posicion_lista=l_primera(*(m->tabla_hash+valor_hash));
+        tEntrada entrada_que_se_esta_viendo=(tEntrada)l_recuperar(*(m->tabla_hash+valor_hash),posicion_lista);
+
+        while (esta_la_clave==0 && entrada_que_se_esta_viendo!=(tEntrada)l_recuperar(*(m->tabla_hash+valor_hash),l_ultima(*(m->tabla_hash+valor_hash))))
         {
             //Si la clave que se esta viendo y la que se quiere insertar son iguales el comparador da cero
-            if (m->comparador(entrada_que_se_esta_viendo->clave,c)==0)
+            if (m->comparador(entrada_que_se_esta_viendo->clave,c)==0){
                 esta_la_clave=1;
+            }
+
             else
             {
-                    posicion_lista=l_siguiente(*(m->tabla_hash+clave),posicion_lista);
-                    entrada_que_se_esta_viendo=l_recuperar(*(m->tabla_hash+clave),posicion_lista);
+                    posicion_lista=l_siguiente(*(m->tabla_hash+valor_hash),posicion_lista);
+                    entrada_que_se_esta_viendo=l_recuperar(*(m->tabla_hash+valor_hash),posicion_lista);
             }
 
         }
 
+
         if (esta_la_clave==0 && m->comparador(entrada_que_se_esta_viendo->clave,c)==0)
-            esta_la_clave=1;
+           {
+                esta_la_clave=1;
+           }
 
         if (esta_la_clave==1)
         {
@@ -183,12 +203,12 @@ extern tValor m_insertar(tMapeo m, tClave c, tValor v)
         }
         else
         {
-            struct entrada *nueva_entrada=(struct entrada*)malloc(sizeof(struct entrada));
+            tEntrada nueva_entrada=(tEntrada)malloc(sizeof(struct entrada));
             if (nueva_entrada==NULL)
                 exit(MAP_ERROR_MEMORIA);
             nueva_entrada->clave=c;
             nueva_entrada->valor=v;
-            l_insertar(*(m->tabla_hash+clave),l_primera(*(m->tabla_hash+clave)),nueva_entrada);
+            l_insertar(*(m->tabla_hash+valor_hash),l_primera(*(m->tabla_hash+valor_hash)),nueva_entrada);
             m->cantidad_elementos=(m->cantidad_elementos)+1;
         }
 
@@ -206,34 +226,69 @@ extern tValor m_insertar(tMapeo m, tClave c, tValor v)
 extern void m_eliminar(tMapeo m, tClave c, void (*fEliminarC)(void *), void (*fEliminarV)(void *))
 {
     int clave=(m->hash_code(c))%(m->longitud_tabla);
+    printf("La posicion en la lista es: %d \n",clave);
     int encontre_la_clave=0;
-    funcion_eliminar_claves=fEliminarC;
-    funcion_eliminar_valores=fEliminarV;
+    //funcion_eliminar_claves=fEliminarC;
+    //funcion_eliminar_valores=fEliminarV;
+    if(l_longitud(*(m->tabla_hash+clave))!=0)
+    {
     tPosicion posicion_lista_entradas=l_primera(*(m->tabla_hash+clave));
     tEntrada entrada_que_se_esta_viendo=(tEntrada)l_recuperar(*(m->tabla_hash+clave),posicion_lista_entradas);
+
+    printf("La clave de la entrada que se esta viendo es: %s \n",entrada_que_se_esta_viendo->clave);
 
     while (encontre_la_clave==0 && entrada_que_se_esta_viendo!=(tEntrada)l_recuperar(*(m->tabla_hash+clave),l_ultima(*(m->tabla_hash+clave))))
     {
        if (m->comparador(entrada_que_se_esta_viendo->clave,c)==0)
+       {
             encontre_la_clave=1;
+            printf("Las claves son iguales \n");
+       }
         else
         {
             posicion_lista_entradas=l_siguiente(*(m->tabla_hash+clave),posicion_lista_entradas);
             entrada_que_se_esta_viendo=(tEntrada)l_recuperar(*(m->tabla_hash+clave),posicion_lista_entradas);
+            printf("Busco en la posicion siguiente \n");
         }
     }
 
     if (encontre_la_clave==0 && (m->comparador(entrada_que_se_esta_viendo->clave,c)==0))
-        encontre_la_clave=1;
+    {
+       encontre_la_clave=1;
+       printf("La clave es igual a la ultima entrada de la lista %s \n",entrada_que_se_esta_viendo->clave);
+    }
 
     if (encontre_la_clave==1)
     {
+        /*
+
         l_eliminar(*(m->tabla_hash+clave),posicion_lista_entradas,&funcion_eliminar_entradas);
-       	m->cantidad_elementos=(m->cantidad_elementos)-1;
+        m->cantidad_elementos=(m->cantidad_elementos)-1;
         entrada_que_se_esta_viendo->clave=NULL;
         entrada_que_se_esta_viendo->valor=NULL;
         entrada_que_se_esta_viendo=NULL;
-}
+        printf("----------------------------------------se elimino");                /* ELIMINAR LOS PRINTF DESPUES
+
+        */
+        fEliminarC(entrada_que_se_esta_viendo->clave);
+        printf("Se elimino la clave \n");
+        fEliminarV(entrada_que_se_esta_viendo->valor);
+        printf("Se elimino el valor \n");
+        l_eliminar(*(m->tabla_hash+clave),posicion_lista_entradas,&funcion_eliminar_entradas_nueva);
+        printf("Se elimino la lista \n");
+        m->cantidad_elementos=(m->cantidad_elementos)-1;
+        entrada_que_se_esta_viendo->clave=NULL;
+        entrada_que_se_esta_viendo->valor=NULL;
+        entrada_que_se_esta_viendo=NULL;
+        printf("se elimino ---------------------------------------\n");
+
+    }
+    else
+        printf("No se elimino nada \n");
+    }
+    else
+        printf("No se elimino nada, la lista estaba vacia \n");
+
 }
 
 /**
@@ -262,28 +317,51 @@ void m_destruir(tMapeo * m, void (*fEliminarC)(void *), void (*fEliminarV)(void 
 
 extern tValor m_recuperar(tMapeo m, tClave c)
 {
+
+
     tValor valor_a_retornar=NULL;
-    int clave=(m->hash_code(c))%(m->longitud_tabla);
-    if (l_longitud(*(m->tabla_hash+clave))!=0)
+    int valor_hash=(m->hash_code(c))%(m->longitud_tabla);
+
+
+    if (l_longitud(*(m->tabla_hash+valor_hash))>0)
     {
+
         int encontre_la_entrada=0;
-        tPosicion posicion_lista_entradas=l_primera(*(m->tabla_hash+clave));
-        tEntrada entrada_que_se_esta_viendo=(tEntrada)l_recuperar(*(m->tabla_hash+clave),posicion_lista_entradas);
-        while (encontre_la_entrada==0 && entrada_que_se_esta_viendo!=(tEntrada)l_recuperar(*(m->tabla_hash+clave),l_ultima(*(m->tabla_hash+clave))))
+
+        tLista *l = (tLista*) *(m->tabla_hash+valor_hash);
+        tPosicion posicion_lista_entradas = (tPosicion)l_primera(l);
+        tEntrada entrada_que_se_esta_viendo= NULL;
+        entrada_que_se_esta_viendo = (tEntrada)l_recuperar(l,posicion_lista_entradas);
+
+
+        int i = 0;
+
+        while (encontre_la_entrada==0 && posicion_lista_entradas!=l_ultima(l))
         {
-            if (m->comparador(entrada_que_se_esta_viendo->clave,c)==0)
-            {
-                encontre_la_entrada=1;
-                valor_a_retornar=entrada_que_se_esta_viendo->valor;
-            }
-            else
-            {
-                posicion_lista_entradas=l_siguiente(*(m->tabla_hash+clave),posicion_lista_entradas);
-                entrada_que_se_esta_viendo=(tEntrada)l_recuperar(*(m->tabla_hash+clave),posicion_lista_entradas);
-            }
+
+
+                if (m->comparador(entrada_que_se_esta_viendo->clave,c)==0)
+                {
+                    encontre_la_entrada=1;
+                    valor_a_retornar=entrada_que_se_esta_viendo->valor;
+                }
+                else
+                {
+                    posicion_lista_entradas=l_siguiente(*(m->tabla_hash+valor_hash),posicion_lista_entradas);
+                    entrada_que_se_esta_viendo=(tEntrada)l_recuperar(*(m->tabla_hash+valor_hash),posicion_lista_entradas);
+                }
+
+
+            i++;
         }
+
+
+
         if (encontre_la_entrada==0 && m->comparador(entrada_que_se_esta_viendo->clave,c)==0)
-            valor_a_retornar=entrada_que_se_esta_viendo->valor;
+            {
+                valor_a_retornar=entrada_que_se_esta_viendo->valor;
+
+            }
     }
     return valor_a_retornar;
 }

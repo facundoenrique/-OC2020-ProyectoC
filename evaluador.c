@@ -6,6 +6,25 @@
 #define letras (caracteres[i]>=97 && caracteres[i]<=122)
 
 /**
+    Funcion que elimina la clave que le pasan como parametro,
+    en este caso se trata de caracteres.
+**/
+void funcion_eliminar_claves_evaluador(char *palabra)
+{
+    free(palabra);
+}
+
+/**
+    Funcion que elimina el valor que le pasan como parametro,
+    en este caso se trata de un entero.
+**/
+void funcion_eliminar_valores_evaluador(int *valor)
+{
+    free(valor);
+}
+
+
+/**
     Funcion para comparar dos claves, las claves en este caso son caracteres.
     El comparador retorna 0 si las dos claves son IGUALES.
 **/
@@ -14,11 +33,15 @@ int comparacion_claves_evaluador(char* palabra1, char* palabra2)
 {
 
     int i = 0;
-    while ((*((palabra1+i))!='\0') && (*((palabra2+i))!='\0') && (*(palabra1+i)==*(palabra2+i)))
-          i=i+1;
-    if (*(palabra1+i)!='\0' || *(palabra2+i)!='\0')
-       return 1;
-    else return 0;
+    if (strlen(palabra1)==strlen(palabra2)){
+        while ((*((palabra1+i))!='\0') && (*((palabra2+i))!='\0') && (*(palabra1+i)==*(palabra2+i)))
+              i=i+1;
+        if (*(palabra1+i)!='\0' && *(palabra2+i)!='\0')
+            return 1;
+        else return 0;
+    }else return 1;
+
+
 
 }
 
@@ -34,46 +57,22 @@ int funcion_hash_evaluador(char *palabra)
 
     while (c = *palabra++)
         hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
-
     return hash;
 }
 
-/**
-    Funcion que elimina la clave que le pasan como parametro,
-    en este caso se trata de caracteres.
-**/
-void funcion_eliminar_claves_evaluador(char *palabra)
-{
-    //Esta bien hecho asi? Hay que eliminar todos los char que componen la palabra
-    int i=0;
-    while (*(palabra+i)!='\0')
-    {
-        free(*(palabra+i));
-        i=i+1;
-    }
-}
-
-/**
-    Funcion que elimina el valor que le pasan como parametro,
-    en este caso se trata de un entero.
-**/
-void funcion_eliminar_valores_evaluador(int *valor)
-{
-    free(valor);
-}
 
 
 int ingreso_nro_de_operacion()
 {
     int nro_operacion;
     int nro_valido=0;
-    printf("Ingrese el numero de operacion que desea realizar: ");
+    printf("Ingrese el n%cmero de operacion que desea realizar: ",163);
     while (!nro_valido)
     {
 
         if(scanf("%i",&nro_operacion) != 1 )
         {
-            printf("No ingreso un numero, ingrese un numero de operacion: ");
+            printf("No ingreso un n%cmero, ingrese un n%cmero de operaci%cn: ",163,163,162);
             /*limpio buffer*/
             while(getchar() != '\n');
         }
@@ -81,7 +80,7 @@ int ingreso_nro_de_operacion()
         {
             if(nro_operacion<1 || nro_operacion>2)
             {
-                printf("No ingreso un numero valido, ingrese nuevamente un numero de operación: ");
+                printf("No ingreso un n%cmero valido, ingrese nuevamente un n%cmero de operaci%cn: ",163,163,162);
             }
             else
             {
@@ -100,7 +99,7 @@ void salir(tMapeo mapeo)
 {
     m_destruir(mapeo,&funcion_eliminar_claves_evaluador,&funcion_eliminar_valores_evaluador);
     free(mapeo);
-    printf("Operacion realizada con exito\n");
+    printf("Operaci%cn realizada con exito\n",162);
     exit(0);
 }
 
@@ -139,7 +138,7 @@ void mostrar_palabra(tMapeo map){
 
 void operaciones(tMapeo map)
 {
-    printf("¿Qué operación desea realizar ahora? \n");
+    printf("¿Qu%c operaci%cn desea realizar ahora? \n",163,162);
     int nro_operacion = ingreso_nro_de_operacion();
     switch(nro_operacion)
     {
@@ -164,19 +163,22 @@ void operaciones(tMapeo map)
 void menu_operaciones(FILE* archivo_texto)
 {
 
-    char* caracteres; /*para leer cada renglon*/
 
-    caracteres=(char*)malloc(100*sizeof(char));
     //tMapeo mapeo;
     tMapeo mapeo;
-    crear_mapeo(&mapeo,5,&funcion_hash_evaluador,&comparacion_claves_evaluador);
+    crear_mapeo(&mapeo,10,&funcion_hash_evaluador,&comparacion_claves_evaluador);
+
+    char* caracteres; /*para leer cada renglon*/
+    caracteres=(char*)malloc(100*sizeof(char));
+
+ char* palabra;
+        palabra = (char*)malloc(20*sizeof(char));
 
 
-    char* palabra;
-    palabra = (char*)malloc(40*sizeof(char));
-    palabra[0]='\0';
+
     while (feof(archivo_texto)==0)
     {
+
 
         fgets(caracteres,100,archivo_texto);
 
@@ -191,156 +193,65 @@ void menu_operaciones(FILE* archivo_texto)
                 //estoy dentro de una palabra.
                 palabra[j]=caracteres[i];
                 j++;
-                palabra[j]='\0'; //le asigno fin de palabra, aunque no haya llegado al final
+                //le asigno fin de palabra, aunque no haya llegado al final
             }
             else   //si es un separador, puedo haber terminado de armar la palabra
             {
-
+                 palabra[j]='\0';
                 int l = strlen(palabra);
-
-
                 if (l>0)   // si longitud de palabra es mayor a 0 arme una cadena
                 {
 
-                    printf("%s \n",palabra);
 
-                    //int valor=(int)m_recuperar(mapeo,palabra);
+
+
                     int *valor;
                     valor=(int*)malloc(sizeof(int));
-                    *valor=(int)m_recuperar(mapeo,palabra);
+
+                    *valor=(int*)m_recuperar(mapeo,palabra);
                     if (*valor==NULL)
                     {
-                        m_insertar(mapeo,palabra,1);
-                        printf("La palabra '%s' no estaba en el mapeo y su valor es: '%d' \n",palabra,*valor);
-                    }
-                    else
-                    {
-                        m_insertar(mapeo,palabra,(*valor)+1);
-                       printf("Incremento el valor de la palabra '%s' a '%d' \n",palabra,*valor);
+                        *valor=0;
                     }
 
-                    int h=0;
-                    while (h<40)  //borro palabra usada
-                    {
-                        palabra[h]=0;
-//----->>>>>>>>>>>>>>>>> o palabra[h]=NULL; ?
-                        h++;
-                    }
-                    j=0;
+
+                    m_insertar(mapeo,palabra,((*valor)+1));
+
+                    palabra=NULL;
+                    palabra = (char*)malloc(20*sizeof(char));
+
+
+                    j=0; //reinicio el indice para armar la palabra siguiente.
                 }// fin if
             }//fin else
-        }
+
+        }//fin for
+
     } //fin while
 
-    free(caracteres);
-    free(palabra);
+ //   free(caracteres);
+
     fclose(archivo_texto); //cierro archivo, ya no lo uso
 
 
     if(&(mapeo)->cantidad_elementos > 0)
     {
-        printf("Menú de operaciones:\n");
+        printf("Men%c de operaciones:\n",163);
         printf("1- Cantidad de apariciones\n");
         printf("2- Salir: permite salir del programa\n");
         operaciones(mapeo);
     }
     else
-        printf("El archivo no contiene palabras válidas.\n");
+        printf("El archivo no contiene palabras v%clidas.\n",160);
 }
 
 
 
-/*
 
-void menu_operaciones(FILE* archivo_texto)
-{
-    char* caracteres; //para leer cada renglon
-
-    caracteres=(char*)malloc(100*sizeof(char));
-    tMapeo *mapeo;
-    //crear_mapeo(&mapeo,5,&funcion_hash_evaluador,&comparacion_claves_evaluador);
-    crear_mapeo(&mapeo,20,funcion_hash_evaluador,comparacion_claves_evaluador);
-    printf("Se crea bien el mapeo \n");          //-----------------------------DESPUES BORRAR ESTO//
-    char* palabra;
-    palabra = (char*)malloc(40*sizeof(char));
-    while (feof(archivo_texto)==0)
-    {
-        fgets(caracteres,80,archivo_texto);
-
-        int i=0;
-        int longitud=strlen(caracteres);
-        int j=0;
-        for (i=0; i<=longitud; i++) //leo todo el renglon en busca de caracteres no validos
-        {
-            if (!separadores)  //si no son separadores armo palabra
-            {
-                //estoy dentro de una palabra.
-                palabra[j]=caracteres[i];
-                j++;
-            }
-            else   //si es un separador, puedo haber terminado de armar la palabra
-            {
-                int l = strlen(palabra);
-                if (l>0)   // si longitud de palabra es mayor a 0 arme una cadena
-                {
-                    palabra[l]='\0'; //le asigno fin de palabra.
-                    //Va esto de aca abajo o creo el int *valor?
-                    //(int)tValor valor = m_recuperar(mapeo,palabra);
-                    //int valor=(int)m_recuperar(mapeo,palabra);
-                    int *valor;
-                    valor=(int)malloc(sizeof(int));
-                    *valor=m_recuperar(mapeo,palabra);
-                    if (*valor==NULL){
-//----------------------valor = 0;
-                        m_insertar(mapeo,palabra,1);
-                        printf("La palabra: %s no estaba en el mapeo. \n",palabra);
-                    }else {
-//---------------------valor++;
-                       m_insertar(mapeo,palabra,valor+1);
-                       printf("Incremento el valor de la clave: %s. \n",palabra);
-                    }
-//----------------------if( m_insertar(mapeo,palabra,valor) != NULL)
-                        printf("Incremento el valor de la clave palabra. \n",palabra);
-
-                    else
-                        printf("La palabra '%s' no estaba en el mapeo \n",palabra);
-                        //
-
-                    int h=0;
-                    while (h<40)  //borro palabra usada
-                    {
-                        palabra[h]=0;
-   //------------------ o palabra[h]=NULL; ?
-                        h++;
-                    }
-                    j=0;
-                }//fin if
-            }//fin else
-        }
-    }
-    free(caracteres);
-    free(palabra);
-    fclose(archivo_texto); //cierro archivo, ya no lo uso
-
-    if((*mapeo)->cantidad_elementos > 0)
-    {
-        printf("Menú de operaciones:\n");
-        printf("1- Cantidad de apariciones\n");
-        printf("2- Salir: permite salir del programa\n");
-        operaciones(mapeo);
-    }
-    else
-        printf("El archivo no contiene palabras válidas.\n");
-}
-
-*/
-
-/**
-**/
 
 int main(int argc, char *argv[])    //--------- agregue un * mas
 {
-    printf("##### EVALUADOR DE ARCHIVO DE TEXTO#####\n");
+    printf("##### EVALUADOR DE ARCHIVO DE TEXTO #####\n");
     if(argc==2)
     {
         char* nombre_archivo_texto = argv[1];
@@ -349,7 +260,7 @@ int main(int argc, char *argv[])    //--------- agregue un * mas
         if((archivo_texto= fopen(nombre_archivo_texto,"r"))==NULL)
         {
             /*Abro el archivo en modo lectura*/
-            printf ("Error al intentar la apertura del archivo parametrizado.\n");
+            printf ("Error al intentar la apertura del archivo.\n");
             return -1;
         }
         else
@@ -359,7 +270,7 @@ int main(int argc, char *argv[])    //--------- agregue un * mas
     }
     else
     {
-        printf ("Error ante la invocación del programa\n");
+        printf ("Error ante la invocaci%cn del programa\n",162);
         return -2;
     }
     return 0; /*?*/

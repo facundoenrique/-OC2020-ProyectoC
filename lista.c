@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "lista.h"
-
+#include "mapeo.h"
 /**
  Inicializa una lista vacia.
  Una referencia a la lista creada es referenciada en *L.
@@ -31,17 +31,21 @@ extern void l_insertar(tLista l, tPosicion p, tElemento e)
         exit(LST_ERROR_MEMORIA);
     if (p!=NULL)
     {
-    if (l->siguiente!=NULL)
-    {
-            nueva_celda->siguiente=p->siguiente;
-            p->siguiente=nueva_celda;
-    }
-    else
-    {
-        nueva_celda->siguiente=NULL;
-        l->siguiente=nueva_celda;
-    }
-    nueva_celda->elemento=e;
+        if (l->siguiente!=NULL)
+        {
+                nueva_celda->elemento=e;
+                nueva_celda->siguiente=p->siguiente;
+                p->siguiente=nueva_celda;
+        }
+        else
+        {
+            nueva_celda->elemento=e;
+            nueva_celda->siguiente=NULL;
+            l->siguiente=nueva_celda;
+        }
+
+    }else {
+        exit(LST_POSICION_INVALIDA);
     }
 }
 
@@ -91,9 +95,15 @@ extern tElemento l_recuperar(tLista l, tPosicion p)
 {
     //if (p==l_fin(l))
     //   exit(LST_POSICION_INVALIDA);
-    if (p->siguiente==NULL)
+    if (l==NULL)
         exit(LST_POSICION_INVALIDA);
-    return p->siguiente->elemento;
+    if ((p==NULL)||(p->siguiente==NULL))
+        exit(LST_POSICION_INVALIDA);
+
+  //  if (p->siguiente->elemento==NULL) printf("elemento recuperado nulo \n");
+ //   else printf("elemento recuperado NO ES NULO \n");
+
+    return (p->siguiente)->elemento;
 }
 
 /**
@@ -103,7 +113,10 @@ extern tElemento l_recuperar(tLista l, tPosicion p)
 
 extern tPosicion l_primera(tLista l)
 {
+    if (l==NULL)
+        exit(LST_POSICION_INVALIDA);
     tPosicion primera_posicion=l;
+
     return primera_posicion;
 }
 
