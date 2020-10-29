@@ -60,7 +60,7 @@ void ingresarDatos(tMapeo map){
         *valor=(int)m_recuperar(map,palabra);
         struct entrada *nueva_entrada=(struct entrada*)malloc(sizeof(struct entrada));
 
-        nueva_entrada->clave=palabra;
+        nueva_entrada->clave=(funcion_hash_evaluador(palabra)%5);
         nueva_entrada->valor=valor;
 
         l_insertar(*l,l_primera(*l),nueva_entrada);
@@ -91,12 +91,12 @@ void ingresarDatos(tMapeo map){
     for (int j=0 ; j<5 ; j++){
 
         tEntrada elem = (tEntrada)l_recuperar(*l,paRecorrer);
-        tClave c = (char*)elem->clave;
+        tClave c = (int*)elem->clave;
         tValor v = (int*)elem->valor;
 
   //      tValor v = (tValor) m_recuperar(map,elem->clave); //tengo que mostrar que tengo adentro del mapeo
 //        printf("clave en mapeo: %s",v);
-        printf("clave-valor en lista: %s | %i \n",c,&v);
+        printf("clave-valor en lista: %s | %i \n",c,v);
         paRecorrer = (tEntrada)l_siguiente(*l,paRecorrer);
     }
     printf("\nElimine todo ");
@@ -105,7 +105,7 @@ void ingresarDatos(tMapeo map){
 
 int main(int argc, char *argv[])    //--------- agregue un * mas
 {
-    printf("##### TESTEANDO A MANO#####\n");
+    printf("##### TESTEANDO A MANO #####\n");
     tMapeo mapeo;
     crear_mapeo(&mapeo,10,&funcion_hash_evaluador,&comparacion_claves_evaluador);
     ingresarDatos(mapeo);
