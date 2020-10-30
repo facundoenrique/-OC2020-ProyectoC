@@ -81,7 +81,7 @@ extern void l_destruir(tLista * l, void (*fEliminar)(tElemento))
         posicion=auxiliar;
     }
     fEliminar(posicion->elemento);
-    free(posicion);
+ //   free(posicion);
     //o l=NULL; ?
     *l=NULL;
 }
@@ -198,6 +198,7 @@ extern tPosicion l_fin(tLista l)
 
 extern int l_longitud(tLista l)
 {
+
     tPosicion posicion=l;
     int longitud=0;
     if(l->siguiente!=NULL)
@@ -208,5 +209,6 @@ extern int l_longitud(tLista l)
         posicion=posicion->siguiente;
     }
     }
+
     return longitud;
 }

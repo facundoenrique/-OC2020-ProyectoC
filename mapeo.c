@@ -17,21 +17,6 @@ void (*funcion_eliminar_valores)(void*);
 void (*funcion_eliminar_claves)(void*);
 
 
-/**
-    Funcion eliminar entrada que utiliza las funciones globales funcion_eliminar_claves y funcion_eliminar_valores,
-    y libera el espacio de la entrada
-**/
-
-void funcion_eliminar_entradas(tElemento e)
-{
-    tEntrada entrada=(tEntrada)e;
-    funcion_eliminar_claves(entrada->clave);
-    funcion_eliminar_valores(entrada->valor);
-    free(entrada);
-    printf("Elimino la entrada");
-}
-
-
 
 /**
     Funcion que busca el mayor numero entre a y b
@@ -78,7 +63,7 @@ extern void crear_mapeo(tMapeo * m, int ci, int (*fHash)(void *), int (*fCompara
     *m=(tMapeo)malloc(sizeof(struct mapeo));
     if (*m==NULL)
         exit(MAP_ERROR_MEMORIA);
-    int longitud_t=MAX(5,ci);
+    int longitud_t=MAX(10,ci);
     (*m)->longitud_tabla=longitud_t;
     (*m)->cantidad_elementos = 0;
     (*m)->comparador=fComparacion;
@@ -109,6 +94,7 @@ extern tValor m_insertar(tMapeo m, tClave c, tValor v)
     //CONTROLO SI LA CANTIDAD DE ELEMENTOS AGREGANDO LA NUEVA ENTRADA ES MAYOR O IGUAL AL 75%
     //De ser asi agrando el arreglo, inicializo las nuevas listas y copio las entradas en las posiciones correspondientes
     //de la nueva lista
+
 
     /*
     if ((m->cantidad_elementos)+1>=(75*(m->longitud_tabla)/100))
@@ -142,21 +128,23 @@ extern tValor m_insertar(tMapeo m, tClave c, tValor v)
                 }
             }
 
-            l_destruir(&*(m->tabla_hash+i),funcion_eliminar_entradas_vacia);
+       //     l_destruir(&*(m->tabla_hash+i),funcion_eliminar_entradas_vacia);
             //Esto es para ver si se eliminaron correctamente, HAY QUE BORRARLO DESPUES
             if (*(m->tabla_hash+i)==NULL)
                 printf("Se elimino ok \n");
             else
                 printf("no se elimino \n");
 						//-------------------------------------------------------//
-           *(m->tabla_hash+i)=*(nuevo_arreglo+i);
+         //  *(m->tabla_hash+i)=*(nuevo_arreglo+i);
         }
-       (m->tabla_hash)=nuevo_arreglo;
+       // (m->tabla_hash)=nuevo_arreglo;
        // o *(m->tabla_hash)=*nuevo_arreglo; ?
     }
 
-    //--------------------------------------------------------------------------------------------------// TERMINO DE AGRANDAR EL ARREGLO
     */
+
+    //--------------------------------------------------------------------------------------------------// TERMINO DE AGRANDAR EL ARREGLO
+
     int valor_hash=(m->hash_code(c))%(m->longitud_tabla);
     tValor valor_a_retornar=NULL;
 
@@ -231,7 +219,6 @@ extern tValor m_insertar(tMapeo m, tClave c, tValor v)
 extern void m_eliminar(tMapeo m, tClave c, void (*fEliminarC)(void *), void (*fEliminarV)(void *))
 {
     int clave=(m->hash_code(c))%(m->longitud_tabla);
-    printf("La posicion en la lista es: %d \n",clave);
     int encontre_la_clave=0;
     //funcion_eliminar_claves=fEliminarC;
     //funcion_eliminar_valores=fEliminarV;
@@ -240,57 +227,42 @@ extern void m_eliminar(tMapeo m, tClave c, void (*fEliminarC)(void *), void (*fE
     tPosicion posicion_lista_entradas=l_primera(*(m->tabla_hash+clave));
     tEntrada entrada_que_se_esta_viendo=(tEntrada)l_recuperar(*(m->tabla_hash+clave),posicion_lista_entradas);
 
-    printf("La clave de la entrada que se esta viendo es: %s \n",entrada_que_se_esta_viendo->clave);
 
     while (encontre_la_clave==0 && entrada_que_se_esta_viendo!=(tEntrada)l_recuperar(*(m->tabla_hash+clave),l_ultima(*(m->tabla_hash+clave))))
     {
        if (m->comparador(entrada_que_se_esta_viendo->clave,c)==0)
        {
             encontre_la_clave=1;
-            printf("Las claves son iguales \n");
        }
         else
         {
             posicion_lista_entradas=l_siguiente(*(m->tabla_hash+clave),posicion_lista_entradas);
             entrada_que_se_esta_viendo=(tEntrada)l_recuperar(*(m->tabla_hash+clave),posicion_lista_entradas);
-            printf("Busco en la posicion siguiente \n");
         }
     }
 
     if (encontre_la_clave==0 && (m->comparador(entrada_que_se_esta_viendo->clave,c)==0))
     {
        encontre_la_clave=1;
-       printf("La clave es igual a la ultima entrada de la lista %s \n",entrada_que_se_esta_viendo->clave);
     }
 
     if (encontre_la_clave==1)
     {
-        /*
 
-        l_eliminar(*(m->tabla_hash+clave),posicion_lista_entradas,&funcion_eliminar_entradas);
-        m->cantidad_elementos=(m->cantidad_elementos)-1;
-        entrada_que_se_esta_viendo->clave=NULL;
-        entrada_que_se_esta_viendo->valor=NULL;
-        entrada_que_se_esta_viendo=NULL;
-        printf("----------------------------------------se elimino");                /* ELIMINAR LOS PRINTF DESPUES
-
-        */
         fEliminarC(entrada_que_se_esta_viendo->clave);
-        printf("Se elimino la clave \n");
+
         fEliminarV(entrada_que_se_esta_viendo->valor);
-        printf("Se elimino el valor \n");
+
         l_eliminar(*(m->tabla_hash+clave),posicion_lista_entradas,&funcion_eliminar_entradas_nueva);
-        printf("Se elimino el elemento de la lista \n");
+
         m->cantidad_elementos=(m->cantidad_elementos)-1;
 
-        printf("se elimino ---------------------------------------\n");
+
 
     }
-    else
-        printf("No se elimino nada \n");
+
     }
-    else
-        printf("No se elimino nada, la lista estaba vacia \n");
+
 
 }
 
@@ -302,46 +274,58 @@ extern void m_destruir(tMapeo * m, void (*fEliminarC)(void *), void (*fEliminarV
 {
     funcion_eliminar_claves=fEliminarC;
     funcion_eliminar_valores=fEliminarV;
+    tMapeo mapeo_auxiliar=*m;
 
-    //PRIMERA FORMA:
+
+    // SEGUNDA FORMA
+    //int cantidad_arreglo=(*m)->longitud_tabla;
+    int cantidad_arreglo=mapeo_auxiliar->longitud_tabla;
+    printf("La long es: %d \n",cantidad_arreglo);
+
+    printf(" long de la lista en 0 es %d \n",l_longitud(*(mapeo_auxiliar->tabla_hash+0)));
+    printf(" long de la lista en 1 es %d \n",l_longitud(*(mapeo_auxiliar->tabla_hash+1)));
+    printf(" long de la lista en 2 es %d \n",l_longitud(*(mapeo_auxiliar->tabla_hash+2)));
+    printf(" long de la lista en 3 es %d \n",l_longitud(*(mapeo_auxiliar->tabla_hash+3)));
+
     /*
-    for (int i=0;i!=(*m)->longitud_tabla;i++)
-    {
-        //l_destruir(*((*m)->tabla_hash+i),&funcion_eliminar_entradas);
-        //l_destruir((*m)->tabla_hash+i,&funcion_eliminar_entradas);
-        l_destruir(&*((*m)->tabla_hash+i),&funcion_eliminar_entradas);
-        printf("Destruyo la lista numero %d \n",i);
-        free((*m)->tabla_hash+i);
-    }
+
+    printf("Long de la lista en 1 es %d \n",l_longitud(*((*m)->tabla_hash+0)));
+    printf("Long de la lista en 2 es %d \n",l_longitud(*((*m)->tabla_hash+1)));
+    printf("Long de la lista en 3 es %d \n",l_longitud(*((*m)->tabla_hash+2)));
+    printf("Long de la lista en 4 es %d \n",l_longitud(*((*m)->tabla_hash+3)));
+    printf("Long de la lista en 5 es %d \n",l_longitud(*((*m)->tabla_hash+4)));
+    printf("Long de la lista en 6 es %d \n",l_longitud(*((*m)->tabla_hash+5)));
+    printf("Long de la lista en 7 es %d \n",l_longitud(*((*m)->tabla_hash+6)));
+    printf("Long de la lista en 8 es %d \n",l_longitud(*((*m)->tabla_hash+7)));
+
+
 
     */
 
-    printf("Empezando destruccion \n");
 
-    // SEGUNDA FORMA
-    for(int i=0;i!=(*m)->longitud_tabla;i++)
+    for(int i=0;i!=cantidad_arreglo;i++)
     {
-        int j=0;
-        while(j!=l_longitud(*(*m)->tabla_hash+i))
+        printf("Entra al for \n");
+        //if(*((*m)->tabla_hash+i)!=NULL)
+        if (*(mapeo_auxiliar->tabla_hash)!=NULL)
         {
-            printf("repeticion: %i \n",j);
-            tEntrada entrada_a_eliminar=l_recuperar(*(*m)->tabla_hash+i,l_primera(*(*m)->tabla_hash+i));
+            printf("La lista no es nula\n" );
+        int j=0;
+        //while(j!=l_longitud(*(*m)->tabla_hash+i))
+        while (j!=l_longitud(*(mapeo_auxiliar->tabla_hash+i)))
+        {
+            //tEntrada entrada_a_eliminar=l_recuperar(*((*m)->tabla_hash+i),l_primera(*((*m)->tabla_hash+i)));
+            tEntrada entrada_a_eliminar=l_recuperar(*(mapeo_auxiliar->tabla_hash+i),l_primera(*(mapeo_auxiliar->tabla_hash+i)));
             fEliminarC(entrada_a_eliminar->clave);
             fEliminarV(entrada_a_eliminar->valor);
-            l_eliminar(*(*m)->tabla_hash+i,l_primera(*(*m)->tabla_hash+i),funcion_eliminar_entradas_nueva);
+            //l_eliminar(*((*m)->tabla_hash+i),l_primera(*((*m)->tabla_hash+i)),&funcion_eliminar_entradas_nueva);
+            l_eliminar(*(mapeo_auxiliar->tabla_hash+i),l_primera(*(mapeo_auxiliar->tabla_hash+i)),&funcion_eliminar_entradas_nueva);
+            printf("eliminado\n");
         }
-        l_destruir(&(*m)->tabla_hash+i,funcion_eliminar_entradas_vacia);
+       // l_destruir(&*((*m)->tabla_hash+i),&funcion_eliminar_entradas_vacia);
+       // l_destruir(&(*(mapeo_auxiliar->tabla_hash+i)),&funcion_eliminar_entradas_vacia);
+        }
     }
-    printf("Sali del for \n");
-    (*m)->cantidad_elementos=NULL;
-    (*m)->comparador=NULL;
-    (*m)->hash_code=NULL;
-    (*m)->longitud_tabla=NULL;
-    (*m)->tabla_hash=NULL;
-    free(m);
-    (*m)=NULL;
-    //m=NULL;
-    printf("Se destruyo el mapeo y quedo NULO \n");
 }
 
 /**

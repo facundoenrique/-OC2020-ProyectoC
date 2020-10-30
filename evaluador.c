@@ -121,7 +121,7 @@ int ingreso_nro_de_operacion()
 
 void salir(tMapeo mapeo)
 {
-    m_destruir(mapeo,&funcion_eliminar_claves_evaluador,&funcion_eliminar_valores_evaluador);
+    m_destruir(&mapeo,&funcion_eliminar_claves_evaluador,&funcion_eliminar_valores_evaluador);
     free(mapeo);
     printf("Operaci%cn realizada con exito\n",162);
     exit(0);
