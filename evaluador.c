@@ -6,6 +6,30 @@
 #define letras (caracteres[i]>=97 && caracteres[i]<=122)
 
 /**
+    Funciones globales para usarlas en m_eliminar y m_destruir
+**/
+
+void (*funcion_eliminar_valores)(void*);
+void (*funcion_eliminar_claves)(void*);
+
+
+/**
+    Funcion eliminar entrada que utiliza las funciones globales funcion_eliminar_claves y funcion_eliminar_valores,
+    y libera el espacio de la entrada
+**/
+
+void funcion_eliminar_entradas(tElemento e)
+{
+    tEntrada entrada=(tEntrada)e;
+    funcion_eliminar_claves(entrada->clave);
+    funcion_eliminar_valores(entrada->valor);
+    free(entrada);
+    printf("Elimino la entrada");
+}
+
+
+
+/**
     Funcion que elimina la clave que le pasan como parametro,
     en este caso se trata de caracteres.
 **/

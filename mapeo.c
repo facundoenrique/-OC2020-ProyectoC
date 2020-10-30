@@ -9,6 +9,29 @@
 // Obs.: el factor de carga maximo permitido equivale al 75% de la longitud de la tabla.
 // ---------------------------------------------------------------------------------------------
 
+/**
+    Funciones globales para usarlas en m_eliminar y m_destruir
+**/
+
+void (*funcion_eliminar_valores)(void*);
+void (*funcion_eliminar_claves)(void*);
+
+
+/**
+    Funcion eliminar entrada que utiliza las funciones globales funcion_eliminar_claves y funcion_eliminar_valores,
+    y libera el espacio de la entrada
+**/
+
+void funcion_eliminar_entradas(tElemento e)
+{
+    tEntrada entrada=(tEntrada)e;
+    funcion_eliminar_claves(entrada->clave);
+    funcion_eliminar_valores(entrada->valor);
+    free(entrada);
+    printf("Elimino la entrada");
+}
+
+
 
 /**
     Funcion que busca el mayor numero entre a y b
@@ -22,25 +45,7 @@ int MAX(int a, int b)
         return b;
 }
 
-/**
-    Funciones globales para usarlas en m_eliminar y m_destruir
-**/
 
-void (*funcion_eliminar_valores)(void*);
-void (*funcion_eliminar_claves)(void*);
-
-/**
-    Funcion eliminar entrada que utiliza las funciones globales funcion_eliminar_claves y funcion_eliminar_valores,
-    y libera el espacio de la entrada
-**/
-
-void funcion_eliminar_entradas(tElemento e)
-{
-    tEntrada entrada=(tEntrada)e;
-    funcion_eliminar_claves(entrada->clave);
-    funcion_eliminar_valores(entrada->valor);
-    free(entrada);
-}
 /**
     ESTA FUNCION NO HACE NADA Y SE USA EN INSERTAR CUANDO HAY QUE AGRANDAR LA TABLA HASH.
     Se quiere borrar la lista vieja sin borrar las entradas que son copiadas a la lista nueva.
@@ -275,11 +280,9 @@ extern void m_eliminar(tMapeo m, tClave c, void (*fEliminarC)(void *), void (*fE
         fEliminarV(entrada_que_se_esta_viendo->valor);
         printf("Se elimino el valor \n");
         l_eliminar(*(m->tabla_hash+clave),posicion_lista_entradas,&funcion_eliminar_entradas_nueva);
-        printf("Se elimino la lista \n");
+        printf("Se elimino el elemento de la lista \n");
         m->cantidad_elementos=(m->cantidad_elementos)-1;
-        entrada_que_se_esta_viendo->clave=NULL;
-        entrada_que_se_esta_viendo->valor=NULL;
-        entrada_que_se_esta_viendo=NULL;
+
         printf("se elimino ---------------------------------------\n");
 
     }
@@ -295,19 +298,50 @@ extern void m_eliminar(tMapeo m, tClave c, void (*fEliminarC)(void *), void (*fE
  Destruye el mapeo M, elimininando cada una de sus entradas.
  Las claves y valores almacenados en las entradas son eliminados mediante las funciones fEliminarC y fEliminarV.
 **/
-void m_destruir(tMapeo * m, void (*fEliminarC)(void *), void (*fEliminarV)(void *))
+extern void m_destruir(tMapeo * m, void (*fEliminarC)(void *), void (*fEliminarV)(void *))
 {
     funcion_eliminar_claves=fEliminarC;
     funcion_eliminar_valores=fEliminarV;
+
+    //PRIMERA FORMA:
+    /*
     for (int i=0;i!=(*m)->longitud_tabla;i++)
     {
-        //l_destruir(&*((*m)->tabla_hash+i),&funcion_eliminar_entradas); o asi?
-        l_destruir((*m)->tabla_hash+i,&funcion_eliminar_entradas);
+        //l_destruir(*((*m)->tabla_hash+i),&funcion_eliminar_entradas);
+        //l_destruir((*m)->tabla_hash+i,&funcion_eliminar_entradas);
+        l_destruir(&*((*m)->tabla_hash+i),&funcion_eliminar_entradas);
+        printf("Destruyo la lista numero %d \n",i);
         free((*m)->tabla_hash+i);
     }
+
+    */
+
+    printf("Empezando destruccion \n");
+
+    // SEGUNDA FORMA
+    for(int i=0;i!=(*m)->longitud_tabla;i++)
+    {
+        int j=0;
+        while(j!=l_longitud(*(*m)->tabla_hash+i))
+        {
+            printf("repeticion: %i \n",j);
+            tEntrada entrada_a_eliminar=l_recuperar(*(*m)->tabla_hash+i,l_primera(*(*m)->tabla_hash+i));
+            fEliminarC(entrada_a_eliminar->clave);
+            fEliminarV(entrada_a_eliminar->valor);
+            l_eliminar(*(*m)->tabla_hash+i,l_primera(*(*m)->tabla_hash+i),funcion_eliminar_entradas_nueva);
+        }
+        l_destruir(&(*m)->tabla_hash+i,funcion_eliminar_entradas_vacia);
+    }
+    printf("Sali del for \n");
+    (*m)->cantidad_elementos=NULL;
+    (*m)->comparador=NULL;
+    (*m)->hash_code=NULL;
+    (*m)->longitud_tabla=NULL;
+    (*m)->tabla_hash=NULL;
     free(m);
-    *m=NULL;
+    (*m)=NULL;
     //m=NULL;
+    printf("Se destruyo el mapeo y quedo NULO \n");
 }
 
 /**
