@@ -100,8 +100,6 @@ extern tElemento l_recuperar(tLista l, tPosicion p)
     if ((p==NULL)||(p->siguiente==NULL))
         exit(LST_POSICION_INVALIDA);
 
-  //  if (p->siguiente->elemento==NULL) printf("elemento recuperado nulo \n");
- //   else printf("elemento recuperado NO ES NULO \n");
 
     return (p->siguiente)->elemento;
 }

@@ -96,61 +96,60 @@ extern tValor m_insertar(tMapeo m, tClave c, tValor v)
     //de la nueva lista
 
 
-    /*
-    if ((m->cantidad_elementos)+1>=(75*(m->longitud_tabla)/100))
 
+    if ((m->cantidad_elementos)+1>=(75*(m->longitud_tabla)/100))
     {
-        int longitud_nueva=(m->longitud_tabla)*2;
-        tLista *nuevo_arreglo=(tLista*)malloc(sizeof(tLista)*longitud_nueva);
-        if(nuevo_arreglo==NULL)
+
+        int longitud_anterior=m->longitud_tabla;
+        int longitud_nueva=longitud_anterior*2;
+        tLista *tabla_anterior=m->tabla_hash;
+        m->longitud_tabla=longitud_nueva;
+        m->tabla_hash=(tLista*)malloc(sizeof(tLista)*longitud_nueva);
+        if (m->tabla_hash==NULL)
             exit(MAP_ERROR_MEMORIA);
         for (int i=0;i!=longitud_nueva;i++)
         {
-            crear_lista(&*(nuevo_arreglo+i));
+            crear_lista(&*(m->tabla_hash+i));
         }
 
-        int longitud_anterior=m->longitud_tabla;
-        m->longitud_tabla=longitud_nueva;
         for (int i=0;i!=longitud_anterior;i++)
         {
             //VEO SI LA LISTA DE ENTRADAS ANTERIOR NO ESTA VACIA
             //VA *m o m solo? Con m solo da Warning con m* no
-            if(l_longitud(*(m->tabla_hash+i))!=0)
+            if(l_longitud(*(tabla_anterior+i))!=0)
             {
-                tPosicion posicion_lista_entradas=l_primera(*(m->tabla_hash));
-                for (int j=0;j!=l_longitud(*(m->tabla_hash+i));j++)
+                tPosicion posicion_lista_entradas=l_primera(*(tabla_anterior+i));
+                for (int j=0;j!=l_longitud(*(tabla_anterior+i));j++)
                 {
-                    tEntrada entrada_anterior=(tEntrada) l_recuperar((*(m->tabla_hash+i)),posicion_lista_entradas);
+                    tEntrada entrada_anterior=(tEntrada) l_recuperar(*(tabla_anterior+i),posicion_lista_entradas);
+                    //TEXTO PARA VER QUE HAY EN LA ENTRADA QUE SE COPIA EN LA TABLA NUEVA:
+
                     tClave clave_anterior=entrada_anterior->clave;
                     int clave_nueva=(m->hash_code(clave_anterior))%(m->longitud_tabla);
-                    l_insertar(*(nuevo_arreglo+clave_nueva),l_primera(*(nuevo_arreglo+clave_nueva)),entrada_anterior); //puedo pisar el anterior haciendo asi
-                    posicion_lista_entradas=l_siguiente(*(m->tabla_hash+i),posicion_lista_entradas);
+
+                    l_insertar(*(m->tabla_hash+clave_nueva),l_primera(*(m->tabla_hash+clave_nueva)),entrada_anterior);
+                    posicion_lista_entradas=l_siguiente(*(tabla_anterior+i),posicion_lista_entradas);
                 }
             }
 
-       //     l_destruir(&*(m->tabla_hash+i),funcion_eliminar_entradas_vacia);
-            //Esto es para ver si se eliminaron correctamente, HAY QUE BORRARLO DESPUES
-            if (*(m->tabla_hash+i)==NULL)
-                printf("Se elimino ok \n");
-            else
-                printf("no se elimino \n");
-						//-------------------------------------------------------//
-         //  *(m->tabla_hash+i)=*(nuevo_arreglo+i);
+            l_destruir(&*(tabla_anterior+i),funcion_eliminar_entradas_vacia);
+
+
         }
-       // (m->tabla_hash)=nuevo_arreglo;
-       // o *(m->tabla_hash)=*nuevo_arreglo; ?
+
+
     }
 
-    */
+
 
     //--------------------------------------------------------------------------------------------------// TERMINO DE AGRANDAR EL ARREGLO
 
     int valor_hash=(m->hash_code(c))%(m->longitud_tabla);
     tValor valor_a_retornar=NULL;
 
+
     if (l_longitud(*(m->tabla_hash+valor_hash))==0)
     {
-
         tEntrada nueva_entrada=(tEntrada)malloc(sizeof(struct entrada));
         if (nueva_entrada==NULL)
             exit(MAP_ERROR_MEMORIA);
@@ -280,50 +279,22 @@ extern void m_destruir(tMapeo * m, void (*fEliminarC)(void *), void (*fEliminarV
     // SEGUNDA FORMA
     //int cantidad_arreglo=(*m)->longitud_tabla;
     int cantidad_arreglo=mapeo_auxiliar->longitud_tabla;
-    printf("La long es: %d \n",cantidad_arreglo);
-
-    printf(" long de la lista en 0 es %d \n",l_longitud(*(mapeo_auxiliar->tabla_hash+0)));
-    printf(" long de la lista en 1 es %d \n",l_longitud(*(mapeo_auxiliar->tabla_hash+1)));
-    printf(" long de la lista en 2 es %d \n",l_longitud(*(mapeo_auxiliar->tabla_hash+2)));
-    printf(" long de la lista en 3 es %d \n",l_longitud(*(mapeo_auxiliar->tabla_hash+3)));
-
-    /*
-
-    printf("Long de la lista en 1 es %d \n",l_longitud(*((*m)->tabla_hash+0)));
-    printf("Long de la lista en 2 es %d \n",l_longitud(*((*m)->tabla_hash+1)));
-    printf("Long de la lista en 3 es %d \n",l_longitud(*((*m)->tabla_hash+2)));
-    printf("Long de la lista en 4 es %d \n",l_longitud(*((*m)->tabla_hash+3)));
-    printf("Long de la lista en 5 es %d \n",l_longitud(*((*m)->tabla_hash+4)));
-    printf("Long de la lista en 6 es %d \n",l_longitud(*((*m)->tabla_hash+5)));
-    printf("Long de la lista en 7 es %d \n",l_longitud(*((*m)->tabla_hash+6)));
-    printf("Long de la lista en 8 es %d \n",l_longitud(*((*m)->tabla_hash+7)));
-
-
-
-    */
-
 
     for(int i=0;i!=cantidad_arreglo;i++)
     {
-        printf("Entra al for \n");
         //if(*((*m)->tabla_hash+i)!=NULL)
-        if (*(mapeo_auxiliar->tabla_hash)!=NULL)
+        if (*(mapeo_auxiliar->tabla_hash+i)!=NULL)
         {
-            printf("La lista no es nula\n" );
         int j=0;
-        //while(j!=l_longitud(*(*m)->tabla_hash+i))
         while (j!=l_longitud(*(mapeo_auxiliar->tabla_hash+i)))
         {
-            //tEntrada entrada_a_eliminar=l_recuperar(*((*m)->tabla_hash+i),l_primera(*((*m)->tabla_hash+i)));
             tEntrada entrada_a_eliminar=l_recuperar(*(mapeo_auxiliar->tabla_hash+i),l_primera(*(mapeo_auxiliar->tabla_hash+i)));
             fEliminarC(entrada_a_eliminar->clave);
             fEliminarV(entrada_a_eliminar->valor);
-            //l_eliminar(*((*m)->tabla_hash+i),l_primera(*((*m)->tabla_hash+i)),&funcion_eliminar_entradas_nueva);
             l_eliminar(*(mapeo_auxiliar->tabla_hash+i),l_primera(*(mapeo_auxiliar->tabla_hash+i)),&funcion_eliminar_entradas_nueva);
-            printf("eliminado\n");
+
         }
-       // l_destruir(&*((*m)->tabla_hash+i),&funcion_eliminar_entradas_vacia);
-       // l_destruir(&(*(mapeo_auxiliar->tabla_hash+i)),&funcion_eliminar_entradas_vacia);
+        l_destruir(&(*(mapeo_auxiliar->tabla_hash+i)),&funcion_eliminar_entradas_vacia);
         }
     }
 }
@@ -347,14 +318,14 @@ extern tValor m_recuperar(tMapeo m, tClave c)
         int encontre_la_entrada=0;
 
         tLista *l = (tLista*) *(m->tabla_hash+valor_hash);
-        tPosicion posicion_lista_entradas = (tPosicion)l_primera(l);
+        tPosicion posicion_lista_entradas = (tPosicion)l_primera((tLista)l);
         tEntrada entrada_que_se_esta_viendo= NULL;
-        entrada_que_se_esta_viendo = (tEntrada)l_recuperar(l,posicion_lista_entradas);
+        entrada_que_se_esta_viendo = (tEntrada)l_recuperar((tLista)l,posicion_lista_entradas);
 
 
         int i = 0;
 
-        while (encontre_la_entrada==0 && posicion_lista_entradas!=l_ultima(l))
+        while (encontre_la_entrada==0 && posicion_lista_entradas!=l_ultima((tLista)l))
         {
 
 

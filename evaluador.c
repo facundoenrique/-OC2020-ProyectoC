@@ -121,7 +121,7 @@ int ingreso_nro_de_operacion()
 
 void salir(tMapeo mapeo)
 {
-    m_destruir(&mapeo,&funcion_eliminar_claves_evaluador,&funcion_eliminar_valores_evaluador);
+    m_destruir(&mapeo,(void*)&funcion_eliminar_claves_evaluador,(void*)&funcion_eliminar_valores_evaluador);
     free(mapeo);
     printf("Operaci%cn realizada con exito\n",162);
     exit(0);
@@ -143,13 +143,13 @@ void mostrar_palabra(tMapeo map){
 
     int *valor;
     valor=(int*)malloc(sizeof(int));
-    *valor=m_recuperar(map,palabra);
-    if (*valor==NULL){
+    *valor=(int)m_recuperar(map,(tClave)palabra);
+    if ((int*)(*valor)==NULL){
         printf("La palabra no se encuentra en el texto. \n");
     }
     else
     {
-        if (valor>1)
+        if ((int)valor>1)
             printf("La palabra %s se encuentra %d veces en el texto. \n",palabra,*valor);
         else
             printf("La palabra %s se encuentra 1 vez en el texto. \n",palabra);
@@ -190,7 +190,7 @@ void menu_operaciones(FILE* archivo_texto)
 
     //tMapeo mapeo;
     tMapeo mapeo;
-    crear_mapeo(&mapeo,10,&funcion_hash_evaluador,&comparacion_claves_evaluador);
+    crear_mapeo(&mapeo,10,(void*)&funcion_hash_evaluador,(void*)&comparacion_claves_evaluador);
 
     char* caracteres; /*para leer cada renglon*/
     caracteres=(char*)malloc(100*sizeof(char));
@@ -232,8 +232,8 @@ void menu_operaciones(FILE* archivo_texto)
                     int *valor;
                     valor=(int*)malloc(sizeof(int));
 
-                    *valor=(int*)m_recuperar(mapeo,palabra);
-                    if (*valor==NULL)
+                    *valor=(int)m_recuperar(mapeo,palabra);
+                    if ((int*)*valor==NULL)
                     {
                         *valor=0;
                     }
