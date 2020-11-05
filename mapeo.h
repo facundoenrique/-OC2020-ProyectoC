@@ -66,5 +66,8 @@ extern void m_destruir(tMapeo * m, void (*fEliminarC)(void *), void (*fEliminarV
 **/
 extern tValor m_recuperar(tMapeo m, tClave c);
 
+
+
+
 #endif // MAPEO_H_INCLUDED
 
